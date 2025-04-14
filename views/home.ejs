@@ -1,43 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital Appointment Booking</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hospital Appointment Booking</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
 
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="max-w-lg w-full p-8 bg-white shadow-xl rounded-xl mt-10 border-t-4 border-green-600">
-            <h1 class="text-4xl font-semibold text-center text-green-700 mb-6">Hospital Appointment Booking</h1>
+<!-- Success Message -->
 
-            <div class="text-center mb-6">
-                <p class="text-lg text-gray-700 mb-6">Welcome to the hospital's appointment system. To proceed with booking an appointment, please check the available dates or directly book an appointment below.</p>
-                <a href="/get-available-dates" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-300">
-                    Check Available Dates
-                </a>
-            </div>
+  <div class="min-h-screen flex items-center justify-center">
 
-            <!-- Book Appointment Button -->
-            <div class="text-center mt-4">
-                <a href="/book-appointment" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300">
-                    Book Appointment
-                </a>
-            </div>
+    <% if (success_msg && success_msg.length > 0) { %>
+      <div id="flash-success" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-100 text-green-800 px-6 py-3 rounded-lg shadow-md z-50">
+        <%= success_msg %>
+      </div>
+    <% } %>
+  
+    <% if (error_msg && error_msg.length > 0) { %>
+      <div id="flash-error" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-800 px-6 py-3 rounded-lg shadow-md z-50">
+        <%= error_msg %>
+      </div>
+    <% } %>
+  
+    <% if (info_msg && info_msg.length > 0) { %>
+      <div id="flash-info" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-100 text-blue-800 px-6 py-3 rounded-lg shadow-md z-50">
+        <%= info_msg %>
+      </div>
+    <% } %>
+  
+    
+    <div class="relative max-w-lg w-full p-8 bg-white shadow-xl rounded-xl mt-10 border-t-4 border-green-600">
+      
+      <!-- ✅ Logout Button - TOP RIGHT -->
+      <form action="/logout" method="POST" class="absolute top-1 right-4">
+        <button type="submit" class="px-4 py-2 text-red-500 border border-red-600 text-sm rounded hover:font-bold focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition">
+          Logout
+        </button>
+      </form>
 
-            <!-- See All Bookings Button -->
-            <div class="text-center mt-4">
-                <a href="/all-bookings" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-300">
-                    See All Bookings
-                </a>
-            </div>
+      <!-- Heading -->
+      <h1 class="text-4xl font-semibold text-center text-green-700 mb-6">
+        Hospital Appointment Booking
+      </h1>
+      <div class="text-center text-xl text-gray-800 font-medium mb-4">
+        <% if (userRole === 'doctor') { %>
+          Welcome Doctor
+        <% } else if (userRole === 'admin') { %>
+          Welcome Admin
+        <% } else { %>
+          Welcome User
+        <% } %>
+      </div>
+      
+      <!-- Intro Text -->
+      <div class="text-center mb-6">
+        <p class="text-lg text-gray-700 mb-6">
+          Welcome to the hospital's appointment system. To proceed with booking an appointment, please check the available dates or directly book an appointment below.
+        </p>
+        <a href="/get-available-dates" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors duration-300">
+          Check Available Dates
+        </a>
+      </div>
 
-            <div class="text-center mt-8">
-                <p class="text-sm text-gray-500">&copy; 2025 Your Hospital. All rights reserved.</p>
-            </div>
-        </div>
+      <!-- Book Appointment Button -->
+      <!-- Book Appointment Button -->
+<% if (userRole !== 'doctor') { %>
+  <div class="text-center mt-4">
+    <a href="/book-appointment/<%= userId %>" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300">
+      Book Appointment
+    </a>
+  </div>
+<% } %>
+
+
+      <!-- See All Bookings Button -->
+      <div class="text-center mt-4">
+        <a href="/all-bookings/<%= userId %>" class="inline-block px-8 py-4 text-lg font-semibold text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-300">
+          See All Bookings
+        </a>
+      </div>
+
+      <!-- Footer -->
+      <div class="text-center mt-8">
+        <p class="text-sm text-gray-500">&copy; 2025 Your Hospital. All rights reserved.</p>
+      </div>
     </div>
+  </div>
 
+  <script>
+    // Fade out flash messages after 3 seconds
+    setTimeout(() => {
+      const success = document.getElementById('flash-success');
+      const error = document.getElementById('flash-error');
+      const info = document.getElementById('flash-info');
+  
+      [success, error, info].forEach(el => {
+        if (el) {
+          el.style.opacity = '0';
+          setTimeout(() => el.remove(), 500); // remove after fade out
+        }
+      });
+    }, 3000);
+  </script>
+  
 </body>
 </html>

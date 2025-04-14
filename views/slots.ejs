@@ -8,69 +8,187 @@
 </head>
 <body class="bg-gray-100 font-sans text-gray-800">
 
-    <div class="min-h-screen flex flex-col items-center justify-center p-6 space-y-8">
+    <div class="min-h-screen relative flex items-start justify-center p-6">
 
-        <!-- Add Slot Section -->
-        <div class="max-w-2xl w-full p-8 bg-white shadow-xl rounded-xl border-t-4 border-green-600">
-            <h2 class="text-3xl font-semibold text-center text-green-700 mb-6">Add Appointment Slot</h2>
-            
-            <form action="/add-slot" method="POST" class="space-y-4">
-                
-                <!-- Time Selection (between 9 AM and 8 PM with 30-minute intervals) -->
-                <div>
-                    <label for="start-time" class="block text-lg font-medium text-gray-700">Start Time</label>
-                    <input type="time" id="start-time" name="start_time" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        min="09:00" max="20:00" required>
-                </div>
-                
-                <div>
-                    <label for="end-time" class="block text-lg font-medium text-gray-700">End Time</label>
-                    <input type="time" id="end-time" name="end_time" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                        min="09:00" max="20:00" required>
-                </div>
-                
-                <!-- Slot Status (Available or Not Available) -->
-                <div>
-                    <label for="slot-status" class="block text-lg font-medium text-gray-700">Slot Status</label>
-                    <select id="slot-status" name="status" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
-                        <option value="available">Available</option>
-                        <option value="not-available">Not Available</option>
-                    </select>
-                </div>
+        <% if (success_msg && success_msg.length > 0) { %>
+            <div id="flash-success" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-100 text-green-800 px-6 py-3 rounded-lg shadow-md z-50">
+              <%= success_msg %>
+            </div>
+          <% } %>
+          
+          <% if (error_msg && error_msg.length > 0) { %>
+            <div id="flash-error" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-800 px-6 py-3 rounded-lg shadow-md z-50">
+              <%= error_msg %>
+            </div>
+          <% } %>
+          
+          <% if (info_msg && info_msg.length > 0) { %>
+            <div id="flash-info" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-100 text-blue-800 px-6 py-3 rounded-lg shadow-md z-50">
+              <%= info_msg %>
+            </div>
+          <% } %>
 
-                <button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 transition-colors">
-                    Add Slot
-                </button>
-            </form>
+          <div class="mt-2 text-center absolute top-2 right-19">
+            <p class="text-sm text-gray-600">Get available slots (GET) API Endpoint:</p>
+            <code class="bg-gray-100 px-3 py-2 rounded-md inline-block text-blue-700">
+                <%= baseUrl %>/available-slots/<%= userId %>?date=<%= selectedDate %>&type=json
+            </code>
+        </div>
+        <!-- Go to Home Page Button on Top-Right -->
+        <div class="absolute top-6 right-6">
+            <a href="/" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">
+                Go to Home Page
+            </a>
         </div>
 
-        <!-- View Slot Section (Display all slots) -->
-        <div class="max-w-2xl w-full p-8 bg-white shadow-xl rounded-xl border-t-4 border-blue-600">
-            <h2 class="text-3xl font-semibold text-center text-blue-700 mb-6">View Appointment Slots</h2>
-
-            <div class="space-y-4">
-                <% slots.forEach(slot => { %>
-                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-md">
-                        <p class="text-lg text-blue-800"> 
-                            <span class="font-semibold"><%= slot.startTime %></span> - 
-                            <span class="font-semibold"><%= slot.endTime %></span> 
-                             
-                            <span class="<%= slot.status === 'available' ? 'text-green-500' : 'text-red-500' %> font-semibold">
-                                <%= slot.status.charAt(0).toUpperCase() + slot.status.slice(1) %>
-                            </span>
-                        </p>
-                        <form action="/delete-slot" method="POST" class="mt-2 text-center">
-                            <input type="hidden" name="slotId" value="<%= slot._id %>">
-                            <button type="submit" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
-                                Delete Slot
-                            </button>
-                        </form>
-                    </div>
-                <% }); %>
-            </div>
+       
+        <!-- Container with flex layout -->
+        <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl mt-20">
             
+            <!-- Add Slot Section -->
+            <div class="flex-1 p-8 bg-white shadow-xl rounded-xl border-t-4 border-green-600">
+                <h2 class="text-2xl font-semibold text-center text-green-700 mb-6">Add Appointment Slot</h2>
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">Add slots (POST) API Endpoint:</p>
+                    <code class="bg-gray-100 px-3 py-2 rounded-md inline-block text-blue-700">
+                        <%= baseUrl %>/add-slot?type=json
+                    </code>
+                </div>
+                <form action="/add-slot?type=json" method="POST" class="space-y-4 text-base"> 
+
+                    <!-- Time Selection (between 9 AM and 8 PM with 30-minute intervals) -->
+                    <div>
+                        <label for="start-time" class="block text-lg font-medium text-gray-700">Start Time</label>
+                        <input type="time" id="start-time" name="start_time" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    
+                    <div>
+                        <label for="end-time" class="block text-lg font-medium text-gray-700">End Time</label>
+                        <input type="time" id="end-time" name="end_time" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                    </div>
+                    
+                    <!-- Date Selection Dropdown -->
+                    <div>
+                        <label for="slot-date" class="block text-lg font-medium text-gray-700">Select Date</label>
+                        <select 
+                          id="slot-date" 
+                          name="date" 
+                          class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                          onchange="handleDateChange(this)">
+                          <% Object.values(available_dates).forEach(date => { %>
+                            <option value="<%= date %>" <%= selectedDate === date ? 'selected' : '' %>><%= date %></option>
+                          <% }) %>
+                        </select>
+                      </div>
+                      
+
+
+                    <!-- Slot Status (Available or Not Available) -->
+                    <div>
+                        <label for="slot-status" class="block text-lg font-medium text-gray-700">Slot Status</label>
+                        <select id="slot-status" name="status" class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                            <option value="available">Available</option>
+                            <option value="not-available">Not Available</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 transition-colors">
+                        Add Slot
+                    </button>
+                </form>
+            </div>
+
+            <!-- View Slot Section -->
+            <div class="flex-1 p-4 bg-white shadow-md rounded-xl border-t-4 border-blue-600">
+                <h2 class="text-2xl font-semibold text-center text-blue-700 mb-4">View Appointment Slots</h2>
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">Delete slots (POST) API Endpoint:</p>
+                    <code class="bg-gray-100 px-3 py-2 rounded-md inline-block text-blue-700">
+                        <%= baseUrl %>/delete-slot?type=json
+                    </code>
+                </div>
+                <div class="mb-4 px-2">
+                    <p class="text-base text-gray-700 font-medium">
+                        Total Slots: <span class="text-blue-600 font-bold"><%= totalSlots %></span>
+                    </p>
+                </div>
+
+                <!-- Scrollable Div -->
+                <% 
+                const filteredSlots = selectedDate 
+                  ? slots.filter(slot => slot.date === selectedDate) 
+                  : slots; 
+              %>
+              
+              <div class="space-y-3 max-h-96 overflow-y-auto text-base">
+                <% filteredSlots.forEach(slot => { %>
+                  <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                      <div>
+                          <p class="text-sm text-blue-800">
+                              <span class="font-medium"><%= slot.startTime %></span> - 
+                              <span class="font-medium"><%= slot.endTime %></span>
+                          </p>
+                          <p class="text-xs text-yellow-800">
+                              <span class="font-medium"><%= slot.date %></span>
+                          </p>
+                          <p class="<%= slot.status === 'available' ? 'text-green-500' : 'text-red-500' %> text-xs font-medium">
+                              <%= slot.status.charAt(0).toUpperCase() + slot.status.slice(1) %>
+                          </p>
+                      </div>
+                      <form action="/delete-slot?type=json" method="POST" class="text-center">
+                          <input type="hidden" name="slotId" value="<%= slot._id %>">
+                          <button type="submit" class="px-3 py-1 bg-red-600 text-white text-xs font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                              Delete
+                          </button>
+                      </form>
+                  </div>
+                <% }); %>
+              </div>
+                 </div>
         </div>
     </div>
 
+    <script>
+        // Fade out flash messages after 3 seconds
+        setTimeout(() => {
+          const success = document.getElementById('flash-success');
+          const error = document.getElementById('flash-error');
+          const info = document.getElementById('flash-info');
+      
+          [success, error, info].forEach(el => {
+            if (el) {
+              el.style.opacity = '0';
+              setTimeout(() => el.remove(), 500); // remove after fade out
+            }
+          });
+        }, 3000);
+
+        //fetch date from url
+       
+  // Get the "date" from the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedDate = urlParams.get('date');
+
+  // If a date is found in the URL, try to select it in the dropdown
+  if (selectedDate) {
+    const dateSelect = document.getElementById('slot-date');
+    if (dateSelect) {
+      const options = Array.from(dateSelect.options);
+      const match = options.find(option => option.value === selectedDate);
+      if (match) {
+        dateSelect.value = selectedDate;
+      }
+    }
+  }
+
+
+  function handleDateChange(selectElement) {
+  const selectedDate = selectElement.value;
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set("date", selectedDate);
+  window.location.href = currentUrl.toString();
+}
+ 
+        </script>
 </body>
 </html>

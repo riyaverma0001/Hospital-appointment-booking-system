@@ -18,17 +18,33 @@ exports.getAvailableDates = (req, res) => {
             availableDates[i] = formattedDate;
         }
 
+        const userId = req.user?.id
+        console.log('user id', userId)
+        
+        if(req.query.type === 'json') {
+            res.json({
+                success: true,
+                message: message,
+                available_dates: availableDates,
+                userId: userId
+            });
+        }
+        else {
+            res.render('dates', {
+                success: true,
+                message: message,
+                available_dates: availableDates,
+                userId: userId,
+                 baseUrl: `${req.protocol}://${req.get('host')}` 
+            });
+        }
         // success message
-        res.render('dates', {
-            success: true,
-            message: message,
-            available_dates: availableDates
-        });
-        // res.json({
+        // res.render('dates', {
         //     success: true,
         //     message: message,
         //     available_dates: availableDates
         // });
+        
     } catch (error) {
         // error
         res.status(500).json({

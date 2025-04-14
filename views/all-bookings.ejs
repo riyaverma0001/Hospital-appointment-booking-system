@@ -8,40 +8,150 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-gray-100 font-sans text-gray-800">
 
-  <div class="min-h-screen flex flex-col items-center justify-center p-4">
-    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl border-t-4 border-blue-500">
+  <div class="min-h-screen relative flex flex-col items-center justify-center p-4">
+    
+    <% if (success_msg && success_msg.length > 0) { %>
+      <div id="flash-success" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-100 text-green-800 px-6 py-3 rounded-lg shadow-md z-50">
+        <%= success_msg %>
+      </div>
+    <% } %>
+    
+    <% if (error_msg && error_msg.length > 0) { %>
+      <div id="flash-error" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-100 text-red-800 px-6 py-3 rounded-lg shadow-md z-50">
+        <%= error_msg %>
+      </div>
+    <% } %>
+    
+    <% if (info_msg && info_msg.length > 0) { %>
+      <div id="flash-info" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-100 text-blue-800 px-6 py-3 rounded-lg shadow-md z-50">
+        <%= info_msg %>
+      </div>
+    <% } %>
+    <!-- Go to Home Page Button -->
+    <div class="absolute top-6 right-6">
+      <a href="/" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors">
+        Go to Home Page
+      </a>
+    </div>
+
+    <div class="w-full max-w-6xl bg-white rounded-2xl shadow-xl border-t-4 border-blue-500">
       <h2 class="text-3xl font-bold text-center text-blue-600 py-6">All Bookings</h2>
 
-      <!-- Check if bookings array is empty -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">Get all bookings (GET) API Endpoint:</p>
+        <code class="bg-gray-100 px-3 py-2 rounded-md inline-block text-blue-700">
+           
+            <%= baseUrl %>/all-bookings/<%= userId %>?type=json
+        </code>
+    </div>
+
+    <% if (userRole !== 'doctor') { %>
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">cancel bookings (POST) API Endpoint:</p>
+        <code class="bg-gray-100 px-3 py-2 rounded-md inline-block text-red-700">
+           
+            <%= baseUrl %>/cancel-booking/:mobileNo?type=json
+        </code>
+    </div>
+    <% } %>
+      
+
       <% if (bookings.length === 0) { %>
         <p class="text-center text-gray-600 text-lg py-8">No bookings available.</p>
       <% } else { %>
-        <ul class="divide-y divide-gray-200">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           <% bookings.forEach((booking) => { %>
-            <li class="p-6 hover:bg-gray-50 transition duration-200">
-              <div class="flex justify-between items-center">
-                <div>
-                  <p class="text-lg font-semibold text-gray-800">
-                    <strong>Date:</strong> <%= booking.date %>
-                  </p>
-                  <p class="text-md text-gray-600 mt-1">
-                    <strong>Time Slot:</strong> <%= booking.timeSlot %>
-                  </p>
-                </div>
-                <div>
-                  <span 
-                    class="px-3 py-1 text-sm font-medium rounded-lg 
-                    <%= booking.status === 'booked' ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700' %>">
-                    <%= booking.status %>
-                  </span>
-                </div>
+            <div class="bg-white shadow-lg rounded-lg border border-gray-200 p-6 flex flex-col justify-between">
+              <!-- Date and Time Slot Section (Placed at the top) -->
+              <div class="mb-4">
+                <p class="text-lg font-bold text-gray-800">
+                  <strong>Date:</strong> <%= booking.date %>
+                </p>
+                <p class="text-sm text-gray-500 mt-1">
+                  <strong>Time Slot:</strong> <%= booking.timeSlot %>
+                </p>
               </div>
-            </li>
+
+              <!-- Other Information (Below Date and Time Slot) -->
+              <div class="mb-4">
+                <p class="text-sm text-gray-500">
+                  <strong>Booking ID:</strong> <%= booking.bookingId || 'N/A' %>
+                </p>
+                <p class="text-sm text-gray-500">
+                  <strong>Name:</strong> <%= booking.name || 'N/A' %>
+                </p>
+                <p class="text-sm text-gray-500">
+                  <strong>Mobile:</strong> <%= booking.mobile || 'N/A' %>
+                </p>
+                <p class="text-sm text-gray-500">
+                  <strong>Email:</strong> <%= booking.email || 'N/A' %>
+                </p>
+                <p class="text-sm text-gray-500">
+                  <strong>Title:</strong> <%= booking.title || 'N/A' %>
+                </p>
+                <% if (userRole !== 'doctor') { %>
+                  <p class="text-sm text-gray-500">
+                    <strong>Doctor:</strong> Dr. <%= booking.doctor?.name || 'N/A' %>
+                  </p>
+                <% } %>
+                
+              </div>
+
+              <!-- Status Section (Below the Booking Info) -->
+              <div class="flex justify-between items-center">
+                <span 
+                  class="px-3 py-1 text-sm font-medium rounded-lg 
+                  <%= booking.status === 'booked' ? 'bg-green-100 text-green-700' : 
+                      booking.status === 'rescheduled' ? 'bg-blue-100 text-blue-700' : 
+                      booking.status === 'canceled' ? 'bg-red-100 text-red-700' : 
+                      'bg-red-100 text-red-700' %>">
+                  <%= booking.status %>
+                </span>
+                
+                <% if (userRole !== 'doctor') { %>
+                  <div class="flex space-x-2">
+                    <!-- Cancel Button -->
+                    <form action="/cancel-booking/<%= booking.mobile %>" method="POST">
+                      <button type="submit" class="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 transition-colors">
+                        Cancel
+                      </button>
+                    </form>
+  
+                    <!-- Reschedule Button (disabled if status is canceled) -->
+                    <form action="/reschedule-appointment/<%= booking.mobile %>" method="GET">
+                      <button type="submit" 
+                              class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors 
+                              <%= booking.status === 'cancelled' ? 'opacity-50 cursor-not-allowed' : '' %>"
+                              <%= booking.status === 'cancelled' ? 'disabled' : '' %>>
+                        Reschedule
+                      </button>
+                    </form>
+                  </div>
+                <% } %>
+               
+              </div>
+            </div>
           <% }); %>
-        </ul>
+        </div>
       <% } %>
     </div>
   </div>
+
+  <script>
+    // Fade out flash messages after 3 seconds
+    setTimeout(() => {
+      const success = document.getElementById('flash-success');
+      const error = document.getElementById('flash-error');
+      const info = document.getElementById('flash-info');
+  
+      [success, error, info].forEach(el => {
+        if (el) {
+          el.style.opacity = '0';
+          setTimeout(() => el.remove(), 500); // remove after fade out
+        }
+      });
+    }, 3000);
+  </script>
 
 </body>
 </html>
